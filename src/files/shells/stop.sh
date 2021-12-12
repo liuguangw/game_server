@@ -44,7 +44,7 @@ echo "stopping World ......"
 killByName "World"
 
 ###### stop ShareMemory ######
-echo "ShareMemroy is saving data ......"
+echo "ShareMemory is saving data ......"
 touch exit.cmd
 waitForExit "ShareMemory"
 

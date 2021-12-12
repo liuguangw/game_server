@@ -17,8 +17,8 @@ RUN set -eux \
 	&& rm billing_server/*.exe \
 	&& chmod +x ./billing_server/billing \
 	&& cd mysql-connector-odbc-5.3.13-linux-glibc2.12-x86-32bit \
-	&& cp bin/* /usr/local/bin/ \
-	&& cp lib/* /usr/local/lib/ \
+	&& mv bin/* /usr/local/bin/ \
+	&& mv lib/* /usr/local/lib/ \
 	&& cd .. \
 	&& rm -rf ./*.gz \
 	&& rm -rf ./mysql* \
