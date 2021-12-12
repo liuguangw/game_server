@@ -24,13 +24,13 @@ if [ ! -d "/home/tlbb" ]; then
 fi
 
 #copy 脚本
-cp /root/files/shm.sh /home/tlbb/Server/shm
+cp /root/shells/shm.sh /home/tlbb/Server/shm
 #添加执行权限
 chmod -R +x /home/tlbb/Server
 #copy配置文件模板
 cp /root/config/etc/* /etc/
-cp /root/config/config/* /home/tlbb/Server/Config/
-cp /root/config/billing/* /root/files/billing_server/
+cp /root/config/server/* /home/tlbb/Server/Config/
+cp /root/config/billing/* /root/billing_server/
 
 #初始化变量
 initAppVariable() {
@@ -67,7 +67,7 @@ replaceDbConfig() {
   replaceConfigFile "$1" "$2" /etc/odbc.ini
   replaceConfigFile "$1" "$2" /home/tlbb/Server/Config/LoginInfo.ini
   replaceConfigFile "$1" "$2" /home/tlbb/Server/Config/ShareMemInfo.ini
-  replaceConfigFile "$1" "$2" /root/files/billing_server/config.yaml
+  replaceConfigFile "$1" "$2" /root/billing_server/config.yaml
 }
 #replace ip and port
 replaceConfigFile GAME_SERVER_IP "${GAME_SERVER_IP}" /home/tlbb/Server/Config/ServerInfo.ini
@@ -129,7 +129,7 @@ if [ ! -f "${billingLogPath}" ]; then
 fi
 
 ###### start Billing Server ######
-cd /root/files/billing_server || exit 1
+cd /root/billing_server || exit 1
 echo "start Billing ......"
 ./billing up --log-path "${billingLogPath}" -d
 

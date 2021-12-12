@@ -1,23 +1,24 @@
 FROM debian:buster-slim
-COPY config /root/config
-COPY files /root/files
-RUN cd /root/files \
+WORKDIR /home
+COPY files /root/
+ADD lib/mysql-connector-odbc-5.3.13-linux-glibc2.12-x86-32bit.tar.gz /root/
+RUN set -eux \
 	&& dpkg --add-architecture i386 \
 	&& apt-get update \
 	&& apt-get install -y --no-install-recommends libc6:i386 libstdc++6:i386 unixodbc:i386 zlib1g:i386 ca-certificates wget tzdata mariadb-client procps \
 	&& rm -rf /var/lib/apt/lists/* \
-	&& chmod +x *.sh \
-	&& ln -s /root/files/run.sh /usr/local/bin/run_gs \
-	&& ln -s /root/files/stop.sh /usr/local/bin/stop_gs \
+	&& cd /root \
+	&& chmod +x ./shells/*.sh \
+	&& ln -s /root/shells/run.sh /usr/local/bin/run_gs \
+	&& ln -s /root/shells/stop.sh /usr/local/bin/stop_gs \
 	&& wget https://github.com/liuguangw/billing_go/releases/download/v1.3.2/billing_1.3.2.tar.gz \
 	&& tar -zxf billing_1.3.2.tar.gz \
 	&& mv billing_1.3.2 billing_server \
 	&& rm billing_server/*.exe \
-	&& chmod a+x /root/files/billing_server/billing \
-	&& tar -zxf mysql-connector-odbc-5.3.13-linux-glibc2.12-x86-32bit.tar.gz \
+	&& chmod +x ./billing_server/billing \
 	&& cd mysql-connector-odbc-5.3.13-linux-glibc2.12-x86-32bit \
-	&& cp bin/* /usr/local/bin \
-	&& cp lib/* /usr/local/lib \
+	&& cp bin/* /usr/local/bin/ \
+	&& cp lib/* /usr/local/lib/ \
 	&& cd .. \
 	&& rm -rf ./*.gz \
 	&& rm -rf ./mysql* \
