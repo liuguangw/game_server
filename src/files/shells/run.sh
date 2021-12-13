@@ -177,47 +177,53 @@ sleep 3
 #修改日志文件的所有者
 chown -R "$(stat -c '%u:%g' /home)" "${serverLogDir}"
 
-while [ $exitCode -lt 0 ]; do
-  #初始化游戏进程数量
-  gameProcessCount=0
-  processNames="billing ShareMemory World Login Server"
+#检测进程状态,如果意外退出，则返回1
+checkProcessStatus() {
+  #已经收到终止信号了
+  if [ $sigStop -ne 0 ]; then
+    return 0
+  fi
+  processNames=$1
+  pStatus=0
   for processName in $processNames; do
+    #某个进程意外退出了
     if ! pgrep -f "./${processName}" >/dev/null; then
-      #在没有收到终止信号的情况下,某个进程意外退出了
-      if [ $sigStop -eq 0 ]; then
-        echo "${colorRed}${processName} is not running${colorReset}"
-      fi
-    else
-      gameProcessCount=$((gameProcessCount + 1))
+      echo "${colorRed}${processName} is not running${colorReset}"
+      pStatus=1
     fi
   done
+  return $pStatus
+}
 
-  #进程全部正常
-  if [ $gameProcessCount -eq 5 ]; then
-    #sleep
-    sleep 3
-    continue
-  fi
-
-  #在没有收到终止信号的情况下,某个进程意外退出了
-  if [ $sigStop -eq 0 ]; then
-    echo "${colorRed}unexpected process exit${colorReset}"
-	# 等日志刷入文件
-	sleep 2
-    exitCode=1
-  else
-    #已收到停止信号
-    echo "current process count: ${gameProcessCount}"
-    #继续等待进程终止
-    if [ $gameProcessCount -ne 0 ]; then
+#等待所有进程结束
+waitAllProcessExit() {
+  for processName in $1; do
+    #等待进程退出
+    while pgrep -f "./${processName}" >/dev/null; do
       sleep 1
-      continue
-    fi
+    done
+  done
+}
+
+processNames="billing ShareMemory World Login Server"
+while [ $exitCode -lt 0 ]; do
+  if ! checkProcessStatus "$processNames"; then
+    echo "${colorRed}unexpected process exit${colorReset}"
+    # 等日志刷入文件
+    sleep 2
+    exitCode=1
+    break
+  fi
+  if [ $sigStop -eq 0 ]; then
+    #等待下一轮检测
+    sleep 5
+  else
+    #已收到停止信号,等待进程全部结束
+    waitAllProcessExit "$processNames"
     #进程已经全部终止
     echo "${colorGreen}all server stopped${colorReset}"
     exitCode=0
   fi
-
 done
 
 exit $exitCode
