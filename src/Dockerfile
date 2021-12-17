@@ -11,9 +11,9 @@ RUN set -eux \
 	&& chmod +x ./shells/*.sh \
 	&& ln -s /root/shells/run.sh /usr/local/bin/run_gs \
 	&& ln -s /root/shells/stop.sh /usr/local/bin/stop_gs \
-	&& wget https://github.com/liuguangw/billing_go/releases/download/v1.3.2/billing_1.3.2.tar.gz \
-	&& tar -zxf billing_1.3.2.tar.gz \
-	&& mv billing_1.3.2 billing_server \
+	&& wget https://github.com/liuguangw/billing_go/releases/download/v1.3.3/billing-release-x64.tar.gz \
+	&& tar -zxf billing-release-x64.tar.gz \
+	&& mv billing-release-x64 billing_server \
 	&& rm billing_server/*.exe \
 	&& chmod +x ./billing_server/billing \
 	&& cd mysql-connector-odbc-5.3.13-linux-glibc2.12-x86-32bit \
