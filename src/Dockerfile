@@ -1,25 +1,36 @@
 FROM golang:1.23-alpine AS builder
-RUN set -eux \
-    && apk add git make \
+# alpine源镜像地址
+ARG ALPINE_MIRROR_URL=""
+# git url
+ARG BILL_GIT_URL="https://github.com/liuguangw/billing_go.git"
+# go proxy
+ARG GOPROXY=""
+ENV GOPROXY=$GOPROXY
+RUN set -eux; \
+	if [ ! -z "$ALPINE_MIRROR_URL" ];then \
+		sed -i "s/dl-cdn.alpinelinux.org/$ALPINE_MIRROR_URL/g" /etc/apk/repositories; \
+	fi \
+	&& apk update \
+	&& apk add git make \
 	&& cd /home \
-	&& git clone https://github.com/liuguangw/billing_go.git \
+	&& git clone $BILL_GIT_URL billing_go \
 	&& cd billing_go \
-	&& make x64 \
-	&& ls -al .
+	&& make x64
 
 FROM debian:buster-slim
-ARG APT_MIRROR_URL=""
+# Debian源镜像地址
+ARG DEBIAN_MIRROR_URL=""
 WORKDIR /home
 COPY files /root/
 ADD lib/mysql-connector-odbc-5.3.13-linux-glibc2.12-x86-32bit.tar.gz /root/
 COPY --from=builder /home/billing_go/billing-release-x64.tar.gz /root/
 RUN set -eux; \
-    if [ ! -z "$APT_MIRROR_URL" ];then \
-	  sed -i "s/deb.debian.org/$APT_MIRROR_URL/g" /etc/apt/sources.list; \
-    fi; \
-	dpkg --add-architecture i386 \
+	if [ ! -z "$DEBIAN_MIRROR_URL" ];then \
+		sed -i "s/deb.debian.org/$DEBIAN_MIRROR_URL/g" /etc/apt/sources.list; \
+	fi \
+	&& dpkg --add-architecture i386 \
 	&& apt-get update \
-	&& apt-get install -y --no-install-recommends libc6:i386 libstdc++6:i386 unixodbc:i386 zlib1g:i386 ca-certificates wget tzdata mariadb-client procps \
+	&& apt-get install -y --no-install-recommends libc6:i386 libstdc++6:i386 unixodbc:i386 zlib1g:i386 tzdata procps \
 	&& rm -rf /var/lib/apt/lists/* \
 	&& cd /root \
 	&& chmod +x ./shells/*.sh \

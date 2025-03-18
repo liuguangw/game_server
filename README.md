@@ -28,3 +28,16 @@
 - 7384 登录端口
 - 3731(GAME_SERVER_PORT环境变量) 游戏端口
 
+## docker 镜像编译
+
+```sh
+# 使用国内镜像加速
+mirror_url=mirrors.ustc.edu.cn
+go_proxy=https://goproxy.cn
+docker buildx build \
+  --build-arg GOPROXY=${go_proxy} \
+  --build-arg ALPINE_MIRROR_URL=${mirror_url} \
+  --build-arg DEBIAN_MIRROR_URL=${mirror_url} \
+  -t liuguangw/game_server src
+```
+
