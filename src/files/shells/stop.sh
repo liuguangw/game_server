@@ -32,7 +32,7 @@ killByName "Login"
 
 ###### stop billing ######
 billPID=$(pgrep -f billing)
-if kill -SIGTERM ${billPID}; then
+if kill ${billPID}; then
   echo "billing stopped completely !!!!!!"
 fi
 
