@@ -23,6 +23,14 @@ if [ ! -d "/home/tlbb" ]; then
   exit 1
 fi
 
+#billing
+billDir="/home/bill"
+if [ ! -d "${billDir}" ]; then
+  mkdir -p "${billDir}"
+  #修改所有者
+  chown -R "$(stat -c '%u:%g' /home)" ${billDir}
+fi
+
 #copy 脚本
 cp /root/shells/shm.sh /home/tlbb/Server/shm
 #添加执行权限
@@ -30,7 +38,6 @@ chmod -R +x /home/tlbb/Server
 #copy配置文件模板
 cp /root/config/etc/* /etc/
 cp /root/config/server/* /home/tlbb/Server/Config/
-cp /root/config/billing/* /root/billing_server/
 
 #初始化变量
 initAppVariable() {
@@ -67,7 +74,6 @@ replaceDbConfig() {
   replaceConfigFile "$1" "$2" /etc/odbc.ini
   replaceConfigFile "$1" "$2" /home/tlbb/Server/Config/LoginInfo.ini
   replaceConfigFile "$1" "$2" /home/tlbb/Server/Config/ShareMemInfo.ini
-  replaceConfigFile "$1" "$2" /root/billing_server/config.yaml
 }
 #replace ip and port
 replaceConfigFile GAME_SERVER_IP "${GAME_SERVER_IP}" /home/tlbb/Server/Config/ServerInfo.ini
@@ -89,8 +95,18 @@ replaceDbConfig DB_USERNAME "${DB_USERNAME}"
 replaceDbConfig DB_PASSWORD "${DB_PASSWORD}"
 #replace DB_GAME_NAME
 replaceDbConfig DB_GAME_NAME "${DB_GAME_NAME}"
-#replace DB_ACCOUNT_NAME
-replaceDbConfig DB_ACCOUNT_NAME "${DB_ACCOUNT_NAME}"
+
+#billing 配置文件
+billConfPath="${billDir}/config.yaml"
+if [ ! -f "${billConfPath}" ]; then
+  # 复制配置文件
+  cp /root/config/billing/config.yaml "${billConfPath}"
+  replaceConfigFile DB_HOST "${DB_HOST}" "${billConfPath}"
+  replaceConfigFile DB_PORT "${DB_PORT}" "${billConfPath}"
+  replaceConfigFile DB_USERNAME "${DB_USERNAME}" "${billConfPath}"
+  replaceConfigFile DB_PASSWORD "${DB_PASSWORD}" "${billConfPath}"
+  replaceConfigFile DB_ACCOUNT_NAME "${DB_ACCOUNT_NAME}" "${billConfPath}"
+fi
 
 #检测MySQL服务器状态
 checkMysql() {
@@ -122,16 +138,16 @@ if [ ! -d $serverLogDir ]; then
 fi
 
 # 创建billing日志文件(如果不存在)
-billingLogPath="/home/billing.log"
+billingLogPath="${billDir}/billing.log"
 if [ ! -f "${billingLogPath}" ]; then
   touch "${billingLogPath}"
   chown "$(stat -c '%u:%g' /home)" "${billingLogPath}"
 fi
 
 ###### start Billing Server ######
-cd /root/billing_server || exit 1
+cd ${billDir} || exit 1
 echo "start Billing ......"
-./billing up --log-path "${billingLogPath}" -d
+/root/billing_server/billing up --log-path "${billingLogPath}" -d
 
 cd /home/tlbb/Server/ || exit 1
 ulimit -n 65535
