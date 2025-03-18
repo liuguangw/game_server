@@ -30,7 +30,7 @@ RUN set -eux; \
 	fi \
 	&& dpkg --add-architecture i386 \
 	&& apt-get update \
-	&& apt-get install -y --no-install-recommends libc6:i386 libstdc++6:i386 unixodbc:i386 zlib1g:i386 tzdata procps \
+	&& apt-get install -y --no-install-recommends libc6:i386 libstdc++6:i386 unixodbc:i386 zlib1g:i386 tzdata mariadb-client procps \
 	&& rm -rf /var/lib/apt/lists/* \
 	&& cd /root \
 	&& chmod +x ./shells/*.sh \

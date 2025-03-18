@@ -39,6 +39,11 @@ chmod -R +x /home/tlbb/Server
 cp /root/config/etc/* /etc/
 cp /root/config/server/* /home/tlbb/Server/Config/
 
+#初始化密码
+if [ ! -z "${DB_PASSWORD_FILE}" ]; then
+  DB_PASSWORD=$(cat ${DB_PASSWORD_FILE})
+fi
+
 #初始化变量
 initAppVariable() {
   eval "currentValue=\"\$$1\""
