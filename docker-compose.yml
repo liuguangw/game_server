@@ -3,8 +3,10 @@ services:
     image: mysql:${MYSQL_IMAGE_VERSION}
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: "${DB_PASSWORD}"
       TZ: ${TIME_ZONE}
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db_password
+    secrets:
+      - db_password
     volumes:
       - ./mysql/data:/var/lib/mysql
       - ./mysql/sqls:/docker-entrypoint-initdb.d
@@ -26,6 +28,7 @@ services:
     working_dir: /home
     environment:
       TZ: ${TIME_ZONE}
+      DB_PASSWORD_FILE: /run/secrets/db_password
       GAME_SERVER_IP: ${GAME_SERVER_IP}
       GAME_SERVER_PORT: ${GAME_SERVER_PORT}
       SMU_INTERVAL: ${SMU_INTERVAL}
@@ -34,7 +37,7 @@ services:
       BILLING_SERVER_IP: ${BILLING_SERVER_IP}
       BILLING_SERVER_PORT: ${BILLING_SERVER_PORT}
     secrets:
-      - DB_PASSWORD
+      - db_password
     ports:
       - "${GAME_SERVER_LOGIN_PORT}:7384"
       - "${GAME_SERVER_PORT}:${GAME_SERVER_PORT}"
@@ -52,5 +55,5 @@ services:
       - db_server
 
 secrets:
-  DB_PASSWORD:
+  db_password:
     file: db_password.txt
