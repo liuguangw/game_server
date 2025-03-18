@@ -11,7 +11,7 @@ RUN set -eux; \
 		sed -i "s/dl-cdn.alpinelinux.org/$ALPINE_MIRROR_URL/g" /etc/apk/repositories; \
 	fi \
 	&& apk update \
-	&& apk add git make \
+	&& apk add git upx make \
 	&& cd /home \
 	&& git clone $BILL_GIT_URL billing_go \
 	&& cd billing_go \
