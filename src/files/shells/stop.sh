@@ -31,8 +31,8 @@ echo "stopping Login ......"
 killByName "Login"
 
 ###### stop billing ######
-cd /home/bill || exit
-if /root/billing_server/billing stop; then
+billPID=$(pgrep -f billing)
+if kill -SIGTERM ${billPID}; then
   echo "billing stopped completely !!!!!!"
 fi
 
