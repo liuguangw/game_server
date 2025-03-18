@@ -31,8 +31,8 @@ echo "stopping Login ......"
 killByName "Login"
 
 ###### stop billing ######
-cd /root/billing_server || exit
-if ./billing stop; then
+cd /home/bill || exit
+if /root/billing_server/billing stop; then
   echo "billing stopped completely !!!!!!"
 fi
 
