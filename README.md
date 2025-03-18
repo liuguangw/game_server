@@ -6,6 +6,7 @@ a game server run by docker-compose
 
 - install docker and docker-compose
 - modify the configuration in the `.env` file
+- modify the database password in the `db_password.txt` file
 - put `tlbb.tar.gz` into `home` directory
 - run ./run.sh
 

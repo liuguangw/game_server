@@ -1,5 +1,3 @@
-version: '3'
-
 services:
   db_server:
     image: mysql:${MYSQL_IMAGE_VERSION}
@@ -28,7 +26,6 @@ services:
     working_dir: /home
     environment:
       TZ: ${TIME_ZONE}
-      DB_PASSWORD: "${DB_PASSWORD}"
       GAME_SERVER_IP: ${GAME_SERVER_IP}
       GAME_SERVER_PORT: ${GAME_SERVER_PORT}
       SMU_INTERVAL: ${SMU_INTERVAL}
@@ -36,6 +33,8 @@ services:
       WITH_GAME_LOG: ${WITH_GAME_LOG}
       BILLING_SERVER_IP: ${BILLING_SERVER_IP}
       BILLING_SERVER_PORT: ${BILLING_SERVER_PORT}
+    secrets:
+      - DB_PASSWORD
     ports:
       - "${GAME_SERVER_LOGIN_PORT}:7384"
       - "${GAME_SERVER_PORT}:${GAME_SERVER_PORT}"
@@ -51,3 +50,7 @@ services:
     hostname: game_server
     depends_on:
       - db_server
+
+secrets:
+  DB_PASSWORD:
+    file: db_password.txt
