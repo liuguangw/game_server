@@ -15,7 +15,7 @@ RUN set -eux; \
 	&& cd /home \
 	&& git clone $BILL_GIT_URL billing_go \
 	&& cd billing_go \
-	&& make x64
+	&& make x64 useUpx=1
 
 FROM debian:buster-slim
 # Debian源镜像地址
